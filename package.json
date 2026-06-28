@@ -1,0 +1,13 @@
+{
+  "name": "mango-massage",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "망고 마사지 · 서울·경기·인천 출장마사지 수도권 지역별 예약 안내",
+  "scripts": {
+    "build": "node build.mjs",
+    "serve": "node serve.mjs"
+  },
+  "author": "수도권 방문형 서비스 지역 안내팀",
+  "license": "UNLICENSED"
+}

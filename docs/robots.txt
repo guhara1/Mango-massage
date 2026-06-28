@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://mango-massage.example/sitemap.xml
