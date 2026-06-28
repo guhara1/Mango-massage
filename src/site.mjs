@@ -6,8 +6,8 @@ export const SITE = {
   brand: '망고 마사지',
   legalName: '망고 마사지',
   tagline: '서울·경기·인천 출장마사지 · 수도권 지역별 예약 안내',
-  // 실제 운영 도메인으로 교체하세요.
-  baseUrl: 'https://mango-massage.example',
+  // 실제 운영 도메인
+  baseUrl: 'https://mango-massage.pages.dev',
   locale: 'ko_KR',
   lang: 'ko',
   phone: '0508-202-4719',
