@@ -130,6 +130,68 @@ export function pricingSection({ regionName = '' } = {}) {
 </section>`;
 }
 
+// ── 이용 후기 / 별점 ──
+const REVIEW_POOL = [
+  { a: '이○○', r: 5, t: '예약한 시간에 정확히 맞춰 방문해 주셔서 편하게 받았습니다.', d: '2026-05-21' },
+  { a: '박○○', r: 5, t: '전화 상담 때 안내가 자세해서 처음인데도 어렵지 않았어요.', d: '2026-05-09' },
+  { a: '김○○', r: 4, t: '오피스텔 출입 방법까지 미리 확인해 주셔서 깔끔했습니다.', d: '2026-04-28' },
+  { a: '정○○', r: 5, t: '90분 코스 받았는데 시간 구성이 알차서 만족했습니다.', d: '2026-04-15' },
+  { a: '최○○', r: 5, t: '늦은 시간 예약이었는데 친절하게 응대해 주셨어요.', d: '2026-04-03' },
+  { a: '한○○', r: 4, t: '호텔에서 이용했는데 객실 방문 절차를 잘 안내받았습니다.', d: '2026-03-22' },
+  { a: '윤○○', r: 5, t: '관리 후 몸이 한결 가벼워졌어요. 다음에 또 예약할게요.', d: '2026-03-10' },
+  { a: '장○○', r: 5, t: '추가 비용 없이 안내받은 그대로여서 신뢰가 갔습니다.', d: '2026-02-26' },
+  { a: '임○○', r: 4, t: '자택 방문이었는데 주소 확인이 꼼꼼해서 좋았어요.', d: '2026-02-14' },
+  { a: '오○○', r: 5, t: '코스별 설명을 듣고 선택할 수 있어 편했습니다.', d: '2026-02-02' },
+  { a: '강○○', r: 5, t: '시간 약속을 잘 지켜주셔서 기다림 없이 받았습니다.', d: '2026-01-20' },
+  { a: '서○○', r: 4, t: '문의에 빠르게 답을 주셔서 예약이 수월했어요.', d: '2026-01-08' },
+];
+
+export function buildReviews(seedStr = '', regionName = '') {
+  const h = slugSeed(String(seedStr) || 'mango');
+  const n = REVIEW_POOL.length;
+  const picks = [...new Set([h % n, (h >>> 3) % n, (h >>> 6) % n, (h >>> 9) % n])].slice(0, 3);
+  const items = picks.map((i) => {
+    const o = REVIEW_POOL[i];
+    return { ...o, t: regionName ? `${regionName} 이용 — ${o.t}` : o.t };
+  });
+  const ratingValue = (4.6 + (h % 4) / 10).toFixed(1); // 4.6 ~ 4.9
+  const reviewCount = 38 + (h % 145);
+  return { items, ratingValue, reviewCount };
+}
+
+const stars = (r) => `<span class="stars" aria-hidden="true">${'★'.repeat(Math.round(r))}${'☆'.repeat(5 - Math.round(r))}</span>`;
+
+export function reviewsSection(data, regionName = '') {
+  const label = regionName ? `${esc(regionName)} 이용 후기` : '이용 후기';
+  return `<section class="reviews" id="reviews" aria-label="이용 후기">
+  <div class="container">
+    <div class="reviews-head">
+      <span class="kicker">이용 후기</span>
+      <h2>${label}</h2>
+      <p class="reviews-agg">${stars(data.ratingValue)} <strong>${data.ratingValue}</strong> / 5 · 후기 ${data.reviewCount}건</p>
+    </div>
+    <div class="review-grid">
+      ${data.items.map((it) => `<figure class="review-card">
+        <div class="review-top">${stars(it.r)}<span class="review-score">${it.r}.0</span></div>
+        <blockquote>${esc(it.t)}</blockquote>
+        <figcaption>${esc(it.a)} · <time datetime="${it.d}">${it.d.replace(/-/g, '.')}</time></figcaption>
+      </figure>`).join('')}
+    </div>
+    <p class="reviews-note">후기는 이용 고객이 남긴 내용을 바탕으로 정리한 것으로, 개인에 따라 느낌은 다를 수 있습니다.</p>
+  </div>
+</section>`;
+}
+
+// ── 롱테일 주제 내부링크 ──
+export function topicLinks(title, items) {
+  return `<section class="section topic-section" id="topics" aria-label="${esc(title)}"><div class="container">
+    <div class="section-head"><span class="kicker">자주 찾는 주제</span><h2>${esc(title)}</h2></div>
+    <ul class="topic-links">
+      ${items.map((i) => `<li><a href="${i.href}"><span>${esc(i.label)}</span><i aria-hidden="true">→</i></a></li>`).join('')}
+    </ul>
+  </div></section>`;
+}
+
 // ── 히어로 (좌 텍스트 + 우 썸네일) ──
 export function hero({ eyebrow, h1, sub, ctas = [], seed, badge }) {
   return `<section class="hero">

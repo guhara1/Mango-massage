@@ -1,6 +1,6 @@
 // 모든 페이지 본문 + 메타데이터 빌더
 import { SITE } from './site.mjs';
-import { hero, breadcrumb, esc, pricingSection } from './components.mjs';
+import { hero, breadcrumb, esc, pricingSection, buildReviews, reviewsSection, topicLinks } from './components.mjs';
 import {
   article, COMMON_FAQ, RESERVE_CHECKLIST, checklistHtml,
   operatingBlock, trustBlock, relatedBlock,
@@ -19,6 +19,29 @@ const PROVINCE = {
 // 번호동을 대표 1개로 통합 + 중복 제거 (모듈 공용)
 const normDongList = (list) =>
   [...new Set((list || []).map((d) => d.replace(/^([가-힣]+?)\d+동$/, '$1동')))];
+
+// 후기 섹션(HTML) + 스키마용 데이터 묶음
+function reviewExtras(seedStr, regionName = '') {
+  const data = buildReviews(seedStr, regionName);
+  return {
+    html: reviewsSection(data, regionName),
+    service: { ratingValue: data.ratingValue, reviewCount: data.reviewCount, reviews: data.items },
+  };
+}
+
+// 지역 페이지용 롱테일 주제 내부링크
+function regionTopics(name, prov) {
+  return [
+    { label: `${name} 오피스텔 출장마사지 예약 전 확인`, href: '/use/officetel/' },
+    { label: `${name} 호텔·숙소 방문 이용 기준`, href: '/use/hotel/' },
+    { label: `${name} 자택 방문 예약 방법`, href: '/use/home/' },
+    { label: `${name} 야간 예약 가능 시간 안내`, href: '/use/night/' },
+    { label: `${name} 역세권 출장마사지 이용 기준`, href: '/use/station-area/' },
+    { label: `${name} 홈타이 코스별 기본 요금`, href: '/check/fare/' },
+    { label: `${name} 생활권별 방문 안내`, href: `${prov.href}life/` },
+    { label: `${name} 예약 전 체크리스트`, href: '/check/' },
+  ];
+}
 
 // ─────────────────────────────────────────────────────────
 // 지역(구/시군) 상세 페이지
@@ -42,8 +65,11 @@ function regionPage(provKey, r) {
     { id: 'faq', label: '자주 묻는 질문' },
     { id: 'trust', label: '작성·검수 안내' },
     { id: 'related', label: '관련 지역' },
+    { id: 'topics', label: '자주 찾는 주제' },
+    { id: 'reviews', label: '이용 후기' },
   ];
 
+  const rv = reviewExtras(`${provKey}-${r.slug}`, r.name);
   // 번호동 안전 통합: '가양1동'·'동탄2동' 등 → 대표 1개. ('종로1가동' 등 가동 형태는 보존)
   const normDongs = (list) => [...new Set((list || []).map((d) => d.replace(/^([가-힣]+?)\d+동$/, '$1동')))];
   // 행정동 칩을 클릭 가능한 링크로 (개별 행정동 페이지로 연결)
@@ -124,6 +150,7 @@ function regionPage(provKey, r) {
     imageAlt: `${r.name} 생활권 방문형 관리 안내 이미지`,
     breadcrumb: [crumbHome, { label: prov.name, href: prov.href }, { label: r.name, href: url }],
     faqs: COMMON_FAQ,
+    service: rv.service,
     body:
       breadcrumb([crumbHome, { label: prov.name, href: prov.href }, { label: r.name, href: url }]) +
       hero({
@@ -138,7 +165,9 @@ function regionPage(provKey, r) {
         badge: `${r.name} 안내`,
       }) +
       pricingSection({ regionName: r.name }) +
-      article({ toc, inner }),
+      article({ toc, inner }) +
+      topicLinks(`${r.name} 출장마사지 자주 찾는 주제`, regionTopics(r.name, prov)) +
+      rv.html,
   };
 }
 
@@ -162,6 +191,7 @@ function generalGuPage(provKey, city, district) {
   const url = `${cityUrl}${district.name}/`;
   const dongs = normDongList(district.dongs);
   const siblingGu = city.districts.filter((d) => d.name !== district.name);
+  const rv = reviewExtras(`${provKey}-${city.slug}-${district.name}`, `${city.name} ${district.name}`);
   const toc = [
     { id: 'overview', label: `${district.name} 개요` },
     { id: 'price', label: '기본 요금' },
@@ -172,6 +202,7 @@ function generalGuPage(provKey, city, district) {
     { id: 'faq', label: '자주 묻는 질문' },
     { id: 'trust', label: '작성·검수 안내' },
     { id: 'related', label: '관련 지역' },
+    { id: 'reviews', label: '이용 후기' },
   ];
   const inner = `
     <h2 id="overview">${city.name} ${district.name} 지역 개요</h2>
@@ -217,6 +248,7 @@ function generalGuPage(provKey, city, district) {
     imageAlt: `${city.name} ${district.name} 방문형 관리 안내 이미지`,
     breadcrumb: [crumbHome, { label: prov.name, href: prov.href }, { label: city.name, href: cityUrl }, { label: district.name, href: url }],
     faqs: COMMON_FAQ,
+    service: rv.service,
     body:
       breadcrumb([crumbHome, { label: prov.name, href: prov.href }, { label: city.name, href: cityUrl }, { label: district.name, href: url }]) +
       hero({
@@ -227,7 +259,8 @@ function generalGuPage(provKey, city, district) {
         seed: city.slug + district.name, badge: `${district.name} 안내`,
       }) +
       pricingSection({ regionName: `${city.name} ${district.name}` }) +
-      article({ toc, inner }),
+      article({ toc, inner }) +
+      rv.html,
   };
 }
 
@@ -240,6 +273,7 @@ function dongPage(provKey, region, dongName, parentLabel, base, siblingDongs) {
   const parentUrl = base; // 상위(구/시 또는 일반구) URL
   const where = parentLabel ? `${region.name} ${parentLabel}` : region.name;
   const sibs = normDongList(siblingDongs).filter((d) => d !== dongName).slice(0, 14);
+  const rv = reviewExtras(`${provKey}-${region.slug}-${dongName}`, dongName);
   const toc = [
     { id: 'overview', label: `${dongName} 개요` },
     { id: 'price', label: '기본 요금' },
@@ -250,6 +284,7 @@ function dongPage(provKey, region, dongName, parentLabel, base, siblingDongs) {
     { id: 'faq', label: '자주 묻는 질문' },
     { id: 'trust', label: '작성·검수 안내' },
     { id: 'related', label: '관련 지역' },
+    { id: 'reviews', label: '이용 후기' },
   ];
   const inner = `
     <h2 id="overview">${dongName} 출장마사지 지역 개요</h2>
@@ -297,6 +332,7 @@ function dongPage(provKey, region, dongName, parentLabel, base, siblingDongs) {
     imageAlt: `${dongName} 방문형 관리 안내 이미지`,
     breadcrumb: [crumbHome, { label: prov.name, href: prov.href }, { label: region.name, href: `${prov.href}${region.slug}/` }, { label: dongName, href: url }],
     faqs: COMMON_FAQ,
+    service: rv.service,
     body:
       breadcrumb([crumbHome, { label: prov.name, href: prov.href }, { label: region.name, href: `${prov.href}${region.slug}/` }, { label: dongName, href: url }]) +
       hero({
@@ -307,7 +343,8 @@ function dongPage(provKey, region, dongName, parentLabel, base, siblingDongs) {
         seed: region.slug + dongName, badge: `${dongName}`,
       }) +
       pricingSection({ regionName: dongName }) +
-      article({ toc, inner }),
+      article({ toc, inner }) +
+      rv.html,
   };
 }
 
@@ -317,6 +354,7 @@ function dongPage(provKey, region, dongName, parentLabel, base, siblingDongs) {
 function provinceHub(provKey, opts) {
   const prov = PROVINCE[provKey];
   const url = prov.href;
+  const rv = reviewExtras(`${provKey}-hub`, prov.name);
   const toc = [
     { id: 'intro', label: `${prov.name} 안내` },
     { id: 'regions', label: `${prov.name} ${prov.sib} 바로가기` },
@@ -327,6 +365,8 @@ function provinceHub(provKey, opts) {
     { id: 'faq', label: '자주 묻는 질문' },
     { id: 'trust', label: '작성·검수 안내' },
     { id: 'related', label: '관련 안내' },
+    { id: 'topics', label: '자주 찾는 주제' },
+    { id: 'reviews', label: '이용 후기' },
   ];
 
   const regionCards = prov.regions.map((r) =>
@@ -389,6 +429,7 @@ function provinceHub(provKey, opts) {
     imageAlt: `${prov.name} 수도권 방문형 관리 지역 안내 이미지`,
     breadcrumb: [crumbHome, { label: prov.name, href: prov.href }],
     faqs: COMMON_FAQ,
+    service: rv.service,
     body:
       breadcrumb([crumbHome, { label: prov.name, href: prov.href }]) +
       hero({
@@ -403,7 +444,18 @@ function provinceHub(provKey, opts) {
         badge: `${prov.name} 지역 안내`,
       }) +
       pricingSection({ regionName: prov.name }) +
-      article({ toc, inner }),
+      article({ toc, inner }) +
+      topicLinks(`${prov.name} 출장마사지 자주 찾는 주제`, [
+        { label: `${prov.name} 오피스텔 출장마사지 이용 기준`, href: '/use/officetel/' },
+        { label: `${prov.name} 호텔·숙소 방문 안내`, href: '/use/hotel/' },
+        { label: `${prov.name} 자택 방문 예약 방법`, href: '/use/home/' },
+        { label: `${prov.name} 야간 예약 가능 시간`, href: '/use/night/' },
+        { label: `${prov.name} 생활권별 안내`, href: `${prov.href}life/` },
+        { label: `${prov.name} 지하철역 역세권 안내`, href: `${prov.href}station/` },
+        { label: '홈타이 코스별 기본 요금', href: '/check/fare/' },
+        { label: '예약 전 확인 체크리스트', href: '/check/' },
+      ]) +
+      rv.html,
   };
 }
 
@@ -590,6 +642,7 @@ function checkPage(c) {
 // 메인 페이지
 // ─────────────────────────────────────────────────────────
 function mainPage() {
+  const rv = reviewExtras('main', '');
   const toc = [
     { id: 'diff', label: '수도권은 지역별 기준이 다릅니다' },
     { id: 'price', label: '기본 요금' },
@@ -600,6 +653,8 @@ function mainPage() {
     { id: 'operating', label: '운영 기준' },
     { id: 'faq', label: '자주 묻는 질문' },
     { id: 'trust', label: '작성·검수 안내' },
+    { id: 'topics', label: '자주 찾는 주제' },
+    { id: 'reviews', label: '이용 후기' },
   ];
   const inner = `
     <h2 id="diff">서울·경기·인천은 같은 수도권이라도 이용 기준이 다릅니다</h2>
@@ -651,6 +706,7 @@ function mainPage() {
     imageAlt: '수도권 서울·경기·인천 방문형 관리 지역 안내 이미지',
     breadcrumb: [crumbHome],
     faqs: COMMON_FAQ,
+    service: rv.service,
     body:
       hero({
         eyebrow: '서울 · 경기 · 인천 수도권 전 지역',
@@ -665,7 +721,20 @@ function mainPage() {
         badge: `예약 ${SITE.phone}`,
       }) +
       pricingSection({}) +
-      article({ toc, inner }),
+      article({ toc, inner }) +
+      topicLinks('수도권 출장마사지 자주 찾는 주제', [
+        { label: '강남 오피스텔 출장마사지 예약 전 확인', href: '/seoul/gangnam-gu/' },
+        { label: '분당·판교 업무지구 방문 이용 기준', href: '/gyeonggi/seongnam/' },
+        { label: '송도 신도시 출장마사지 안내', href: '/incheon/yeonsu-gu/' },
+        { label: '인천공항 인근 호텔·숙소 이용', href: '/incheon/airport-islands/' },
+        { label: '수원 광교·영통 생활권 안내', href: '/gyeonggi/suwon/' },
+        { label: '부평 역세권 출장마사지 이용', href: '/incheon/bupyeong-gu/' },
+        { label: '야간 예약 가능 시간 안내', href: '/use/night/' },
+        { label: '외곽 지역 추가 이동비 기준', href: '/check/fare/' },
+        { label: '자택 방문 예약 방법', href: '/use/home/' },
+        { label: '홈타이 코스별 기본 요금', href: '/check/fare/' },
+      ]) +
+      rv.html,
   };
 }
 

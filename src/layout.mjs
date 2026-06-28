@@ -1,11 +1,11 @@
 // 페이지 셸 + 구조화 데이터(JSON-LD) 조립
 import { SITE } from './site.mjs';
-import { header, footer, esc, thumbSVG } from './components.mjs';
+import { header, footer, esc, thumbSVG, PRICE_TIERS } from './components.mjs';
 
 const abs = (p) => (p.startsWith('http') ? p : SITE.baseUrl + encodeURI(p));
 
 // ── 구조화 데이터 ──
-function schemaBlocks({ url, title, description, breadcrumb = [], faqs = [], imageAlt }) {
+function schemaBlocks({ url, title, description, breadcrumb = [], faqs = [], imageAlt, service }) {
   const ogImage = abs(url + 'thumb.svg').replace(/\/+thumb/, '/thumb');
   const blocks = [];
 
@@ -81,6 +81,43 @@ function schemaBlocks({ url, title, description, breadcrumb = [], faqs = [], ima
     });
   }
 
+  // Service + Offer(요금) — 모든 페이지. 후기/평점이 있으면 AggregateRating·Review 포함
+  if (service !== false) {
+    const node = {
+      '@type': 'Service',
+      '@id': abs(url) + '#service',
+      name: title,
+      serviceType: '출장마사지·홈타이 방문 관리 안내',
+      provider: { '@id': SITE.baseUrl + '/#org' },
+      areaServed: ['서울특별시', '경기도', '인천광역시'],
+      offers: PRICE_TIERS.map((t) => ({
+        '@type': 'Offer',
+        name: t.name,
+        price: String(t.amount).replace(/,/g, ''),
+        priceCurrency: 'KRW',
+        availability: 'https://schema.org/InStock',
+        url: abs(url),
+      })),
+    };
+    if (service && service.reviews && service.reviews.length) {
+      node.aggregateRating = {
+        '@type': 'AggregateRating',
+        ratingValue: String(service.ratingValue),
+        reviewCount: String(service.reviewCount),
+        bestRating: '5',
+        worstRating: '1',
+      };
+      node.review = service.reviews.map((it) => ({
+        '@type': 'Review',
+        author: { '@type': 'Person', name: it.a },
+        datePublished: it.d,
+        reviewRating: { '@type': 'Rating', ratingValue: String(it.r), bestRating: '5', worstRating: '1' },
+        reviewBody: it.t,
+      }));
+    }
+    blocks.push(node);
+  }
+
   return JSON.stringify({ '@context': 'https://schema.org', '@graph': blocks });
 }
 
@@ -96,6 +133,7 @@ export function page({
   noindex = false,
   imageAlt,
   seed,
+  service,
 }) {
   // 디스크립션 80자 이내 보장
   let desc = (description || SITE.tagline).trim();
@@ -103,7 +141,7 @@ export function page({
 
   const canonical = abs(url);
   const ogImage = abs(url) + 'thumb.svg';
-  const ld = schemaBlocks({ url, title, description: desc, breadcrumb, faqs, imageAlt });
+  const ld = schemaBlocks({ url, title, description: desc, breadcrumb, faqs, imageAlt, service });
 
   return `<!doctype html>
 <html lang="ko">

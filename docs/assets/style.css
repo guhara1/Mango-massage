@@ -401,6 +401,37 @@ a.card:hover { transform: translateY(-3px); box-shadow: var(--sh-2); border-colo
 .pricing-note a { color: var(--mango-300); font-weight: 700; }
 @media (max-width: 760px) { .pricing-grid { grid-template-columns: 1fr; max-width: 420px; } }
 
+/* ============================================================
+   이용 후기 / 별점
+   ============================================================ */
+.reviews { background: var(--surface-2); border-top: 1px solid var(--line); padding-block: clamp(44px, 5.5vw, 68px); }
+.reviews-head { text-align: center; max-width: 60ch; margin: 0 auto 30px; }
+.reviews-head .kicker { color: var(--mango-600); font-weight: 800; font-size: 13px; letter-spacing: .06em; text-transform: uppercase; }
+.reviews-head h2 { margin: 8px 0 10px; }
+.stars { color: var(--gold); letter-spacing: 2px; }
+.reviews-agg { font-size: 18px; color: var(--ink-700); }
+.reviews-agg strong { color: var(--mango-800); font-weight: 900; }
+.review-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; max-width: 1000px; margin: 0 auto; }
+.review-card { margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 22px; box-shadow: var(--sh-1); }
+.review-top { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.review-score { font-weight: 800; color: var(--ink-500); font-size: 14px; }
+.review-card blockquote { margin: 0 0 14px; font-size: 15.5px; color: var(--ink-700); line-height: 1.7; }
+.review-card figcaption { font-size: 13.5px; color: var(--ink-300); font-weight: 600; }
+.reviews-note { text-align: center; color: var(--ink-300); font-size: 13px; margin: 22px auto 0; max-width: 60ch; }
+@media (max-width: 860px) { .review-grid { grid-template-columns: 1fr; max-width: 460px; } }
+
+/* ============================================================
+   롱테일 주제 내부링크
+   ============================================================ */
+.topic-section { padding-block: clamp(36px, 4.5vw, 56px); }
+.topic-links { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.topic-links a { display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 15px 20px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-md);
+  font-weight: 700; color: var(--ink-700); box-shadow: var(--sh-1); transition: .16s ease; }
+.topic-links a:hover { text-decoration: none; border-color: var(--mango-300); background: var(--mango-50); color: var(--mango-800); transform: translateY(-2px); }
+.topic-links i { color: var(--mango-500); font-style: normal; font-weight: 900; }
+@media (max-width: 640px) { .topic-links { grid-template-columns: 1fr; } }
+
 /* 통화 플로팅 버튼 (모바일) */
 .call-fab {
   position: fixed; right: 18px; bottom: 18px; z-index: 90; display: none;
