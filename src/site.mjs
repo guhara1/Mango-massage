@@ -48,57 +48,54 @@ export const WHW = {
 };
 
 // 상단 메뉴 + 드롭다운 (메뉴명에 "출장마사지" 반복 금지)
+import { SEOUL } from './regions/seoul.mjs';
+import { GYEONGGI } from './regions/gyeonggi.mjs';
+import { INCHEON } from './regions/incheon.mjs';
+
+// 구/시군 전체를 드롭다운에 자동 포함
+const regionChildren = (base, regions, extras) => [
+  { label: `${extras.homeLabel}`, href: base },
+  ...regions.map((r) => ({ label: r.name, href: `${base}${r.slug}/` })),
+  ...extras.tail,
+];
+
 export const NAV = [
   { label: '수도권 홈', href: '/' },
   {
     label: '서울',
     href: '/seoul/',
-    children: [
-      { label: '서울 홈', href: '/seoul/' },
-      { label: '강남구', href: '/seoul/gangnam-gu/' },
-      { label: '서초구', href: '/seoul/seocho-gu/' },
-      { label: '송파구', href: '/seoul/songpa-gu/' },
-      { label: '마포구', href: '/seoul/mapo-gu/' },
-      { label: '영등포구', href: '/seoul/yeongdeungpo-gu/' },
-      { label: '성동구', href: '/seoul/seongdong-gu/' },
-      { label: '용산구', href: '/seoul/yongsan-gu/' },
-      { label: '서울 생활권', href: '/seoul/life/' },
-      { label: '서울 지하철역', href: '/seoul/station/' },
-      { label: '서울 이용 장소', href: '/use/' },
-    ],
+    children: regionChildren('/seoul/', SEOUL, {
+      homeLabel: '서울 홈',
+      tail: [
+        { label: '서울 생활권', href: '/seoul/life/' },
+        { label: '서울 지하철역', href: '/seoul/station/' },
+        { label: '이용 장소', href: '/use/' },
+      ],
+    }),
   },
   {
     label: '경기',
     href: '/gyeonggi/',
-    children: [
-      { label: '경기 홈', href: '/gyeonggi/' },
-      { label: '수원', href: '/gyeonggi/suwon/' },
-      { label: '성남', href: '/gyeonggi/seongnam/' },
-      { label: '용인', href: '/gyeonggi/yongin/' },
-      { label: '고양', href: '/gyeonggi/goyang/' },
-      { label: '부천', href: '/gyeonggi/bucheon/' },
-      { label: '안산', href: '/gyeonggi/ansan/' },
-      { label: '안양', href: '/gyeonggi/anyang/' },
-      { label: '경기 생활권', href: '/gyeonggi/life/' },
-      { label: '경기 지하철역', href: '/gyeonggi/station/' },
-      { label: '외곽 지역 안내', href: '/gyeonggi/outskirts/' },
-    ],
+    children: regionChildren('/gyeonggi/', GYEONGGI, {
+      homeLabel: '경기 홈',
+      tail: [
+        { label: '경기 생활권', href: '/gyeonggi/life/' },
+        { label: '경기 지하철역', href: '/gyeonggi/station/' },
+        { label: '외곽 지역 안내', href: '/gyeonggi/outskirts/' },
+      ],
+    }),
   },
   {
     label: '인천',
     href: '/incheon/',
-    children: [
-      { label: '인천 홈', href: '/incheon/' },
-      { label: '중구', href: '/incheon/jung-gu/' },
-      { label: '미추홀구', href: '/incheon/michuhol-gu/' },
-      { label: '연수구', href: '/incheon/yeonsu-gu/' },
-      { label: '남동구', href: '/incheon/namdong-gu/' },
-      { label: '부평구', href: '/incheon/bupyeong-gu/' },
-      { label: '서구', href: '/incheon/seo-gu/' },
-      { label: '인천 생활권', href: '/incheon/life/' },
-      { label: '인천 지하철역', href: '/incheon/station/' },
-      { label: '공항·도서 지역 안내', href: '/incheon/airport-islands/' },
-    ],
+    children: regionChildren('/incheon/', INCHEON, {
+      homeLabel: '인천 홈',
+      tail: [
+        { label: '인천 생활권', href: '/incheon/life/' },
+        { label: '인천 지하철역', href: '/incheon/station/' },
+        { label: '공항·도서 지역 안내', href: '/incheon/airport-islands/' },
+      ],
+    }),
   },
   {
     label: '생활권',

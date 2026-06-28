@@ -1,6 +1,6 @@
 // 본문 섹션 빌더 — 지역/허브/이용 페이지 공통 구조
 import { SITE } from './site.mjs';
-import { tocAside, tocInline, faqBlock, eeatBlock, whwBlock, esc } from './components.mjs';
+import { tocAside, tocInline, faqBlock, byline, esc } from './components.mjs';
 
 export const COMMON_FAQ = [
   { q: '이 지역도 방문 가능한가요?', a: '실제 방문 주소, 가까운 생활권, 예약 가능 시간, 이동 기준을 확인한 뒤 안내합니다. 전화 예약 시 정확한 위치를 알려주세요.' },
@@ -47,12 +47,10 @@ export function operatingBlock() {
     <p style="margin-top:14px">자세한 기준은 <a href="/policy/legal/">불법·선정적 서비스 불가 안내</a>와 <a href="/policy/privacy/">개인정보 처리방침</a>에서 확인할 수 있습니다.</p>`;
 }
 
-// E-E-A-T + WHW 묶음 (모든 주요 페이지 하단)
-export function trustBlock(extra) {
-  return `<h2 id="trust">작성·검수 기준 (E-E-A-T)</h2>
-    ${eeatBlock(extra)}
-    <h3 style="margin-top:1.6em">Who · How · Why</h3>
-    ${whwBlock()}`;
+// 작성·검수 안내 (모든 주요 페이지 하단 — 간결한 바이라인)
+export function trustBlock(extra = {}) {
+  return `<h2 id="trust">작성 및 검수 안내</h2>
+    ${byline(extra)}`;
 }
 
 // 관련 지역/내부링크 블록

@@ -58,9 +58,10 @@ export function thumbSVG(seedStr = 'mango', label = '') {
 function navItem(item, current) {
   const isCur = item.href === current;
   if (item.children) {
+    const wide = item.children.length > 12 ? ' dropdown-grid' : '';
     return `<li class="nav-item has-children">
       <a class="nav-link" href="${item.href}"${isCur ? ' aria-current="page"' : ''}>${esc(item.label)}</a>
-      <div class="dropdown">${item.children
+      <div class="dropdown${wide}">${item.children
         .map((c) => `<a href="${c.href}"${c.href === current ? ' aria-current="page"' : ''}>${esc(c.label)}</a>`)
         .join('')}</div>
     </li>`;
@@ -141,7 +142,16 @@ export function faqBlock(faqs = []) {
   </div>`;
 }
 
-// ── E-E-A-T + Who/How/Why ──
+// ── 작성·검수 안내 (자연스러운 바이라인 — 전문용어/표 없이 신뢰 신호만) ──
+export function byline(extra = {}) {
+  const updated = extra.updated || '2026-06-28';
+  return `<p class="byline">
+    이 페이지는 <strong>${esc(EEAT.author)}</strong>이 작성하고 운영 책임자가 검수했습니다. ${esc(extra.basis || EEAT.basis)} ${esc(extra.experience || '')}
+    <span class="byline-meta">최종 수정 ${esc(updated)} · 행정구역 개편이나 예약 기준 변경 시 업데이트합니다.</span>
+  </p>`;
+}
+
+// ── E-E-A-T + Who/How/Why (현재 본문 미사용, 필요 시 재사용) ──
 export function eeatBlock(extra = {}) {
   return `<div class="eeat">
     <dl>

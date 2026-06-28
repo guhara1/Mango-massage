@@ -29,26 +29,50 @@ function regionPage(provKey, r) {
   const toc = [
     { id: 'overview', label: `${r.name} 개요` },
     { id: 'life', label: '대표 생활권' },
+    { id: 'dong', label: '행정동 전체' },
     { id: 'stations', label: '가까운 지하철역' },
     { id: 'use', label: '이용 장소별 기준' },
     { id: 'reserve', label: '예약 전 체크리스트' },
     { id: 'operating', label: '운영 기준' },
     { id: 'faq', label: '자주 묻는 질문' },
-    { id: 'trust', label: '작성·검수 기준' },
+    { id: 'trust', label: '작성·검수 안내' },
     { id: 'related', label: '관련 지역' },
   ];
+
+  // 번호동 안전 통합: '가양1동'·'동탄2동' 등 → 대표 1개. ('종로1가동' 등 가동 형태는 보존)
+  const collapseDong = (d) => d.replace(/^([가-힣]+?)\d+동$/, '$1동');
+  const normDongs = (list) => [...new Set((list || []).map(collapseDong))];
+  const dongChips = (list) =>
+    `<div class="chips" style="margin-bottom:1em">${normDongs(list)
+      .map((d) => `<span class="chip">${esc(d)}</span>`).join('')}</div>`;
+
+  // 일반구가 있으면 구별로, 없으면 동 목록으로 — 번호동은 데이터에서 대표 1개로 통합됨
+  const dongBody = r.districts && r.districts.length
+    ? r.districts.map((d) =>
+        `<h3>${esc(d.name)}</h3>${dongChips(d.dongs)}`).join('') +
+        (r.dongs && r.dongs.length ? `<h3>${esc(r.name)} 주요 동</h3>${dongChips(r.dongs)}` : '')
+    : dongChips(r.dongs || []);
+
+  const dongCount = r.districts && r.districts.length
+    ? r.districts.reduce((n, d) => n + normDongs(d.dongs).length, 0) + normDongs(r.dongs).length
+    : normDongs(r.dongs).length;
 
   const inner = `
     <h2 id="overview">${r.name} 출장마사지 지역 개요</h2>
     <p>${esc(r.overview)}</p>
-    <p><strong>${esc(r.name)}의 특징</strong> — ${esc(r.character)} 대표 권역은 ${esc(r.landmarks)} 일대로, 같은 ${r.name} 안에서도 이용 장소에 따라 확인할 내용이 달라집니다.</p>
+    <p><strong>${esc(r.name)}의 특징</strong> — ${esc(r.character)} 대표 권역은 ${esc(r.landmarks)} 일대로, 같은 ${r.name} 안에서도 행정동과 이용 장소에 따라 확인할 내용이 달라집니다. ${r.name} 출장마사지·홈타이 예약 전에는 방문 지역의 생활권과 가까운 역, 건물 형태를 먼저 확인하는 것이 좋습니다.</p>
 
     <h2 id="life">${r.name} 대표 생활권</h2>
     <p>${r.name}은 아래 생활권을 중심으로 안내합니다. 생활권마다 건물 형태와 출입 방식이 다르므로, 가까운 생활권을 먼저 확인한 뒤 예약하는 것을 권장합니다.</p>
     <div class="chips" style="margin-bottom:1em">
       ${r.lifeAreas.map((l) => `<span class="chip">${esc(l)}</span>`).join('')}
     </div>
-    <p>각 생활권은 <a href="${provKey === 'seoul' ? '/seoul/life/' : prov.href + 'life/'}">${r.name} 생활권 안내</a>에서 더 자세히 비교할 수 있습니다.</p>
+    <p>각 생활권은 <a href="${prov.href}life/">${prov.name} 생활권 안내</a>에서 더 자세히 비교할 수 있습니다.</p>
+
+    <h2 id="dong">${r.name} 행정동 전체 안내</h2>
+    <p>${r.name}의 행정동을 대표 지역명 기준으로 정리했습니다(총 ${dongCount}곳). 같은 이름의 번호동(예: ○○1동·○○2동)은 대표 동 하나로 묶어 안내하며, 출구별·번호동별 페이지는 따로 만들지 않습니다. 방문 예약 시에는 아래 동 이름과 함께 정확한 도로명 주소·동·호수를 알려주시면 안내가 빠릅니다.</p>
+    ${dongBody}
+    <p>각 동은 인접 생활권·역세권과 함께 확인하는 것이 좋습니다. ${r.name}의 생활권은 <a href="${prov.href}life/">${prov.name} 생활권 안내</a>, 가까운 역은 <a href="${prov.href}station/">${prov.name} 지하철역 안내</a>, 이용 장소별 기준은 <a href="/use/">이용 장소 안내</a>에서 확인하세요.</p>
 
     <h2 id="stations">가까운 지하철역</h2>
     <p>${r.name}의 주요 역세권은 다음과 같습니다. 출구 번호보다 정확한 건물명과 도로명 주소로 안내하면 방문이 원활합니다.</p>
@@ -131,7 +155,7 @@ function provinceHub(provKey, opts) {
     { id: 'reserve', label: '예약 전 체크리스트' },
     { id: 'operating', label: '운영 기준' },
     { id: 'faq', label: '자주 묻는 질문' },
-    { id: 'trust', label: '작성·검수 기준' },
+    { id: 'trust', label: '작성·검수 안내' },
     { id: 'related', label: '관련 안내' },
   ];
 
@@ -296,7 +320,7 @@ function useCasePage(u) {
     { id: 'reserve', label: '예약 전 체크리스트' },
     { id: 'operating', label: '운영 기준' },
     { id: 'faq', label: '자주 묻는 질문' },
-    { id: 'trust', label: '작성·검수 기준' },
+    { id: 'trust', label: '작성·검수 안내' },
   ];
   const inner = `
     <h2 id="intro">${u.name} 안내</h2>
@@ -346,7 +370,7 @@ function checkPage(c) {
     { id: 'point', label: '확인 항목' },
     { id: 'reserve', label: '예약 전 체크리스트' },
     { id: 'operating', label: '운영 기준' },
-    { id: 'trust', label: '작성·검수 기준' },
+    { id: 'trust', label: '작성·검수 안내' },
   ];
   const inner = `
     <h2 id="intro">${c.name}</h2>
@@ -388,7 +412,7 @@ function mainPage() {
     { id: 'reserve', label: '예약 전 체크리스트' },
     { id: 'operating', label: '운영 기준' },
     { id: 'faq', label: '자주 묻는 질문' },
-    { id: 'trust', label: '작성·검수 기준' },
+    { id: 'trust', label: '작성·검수 안내' },
   ];
   const inner = `
     <h2 id="diff">서울·경기·인천은 같은 수도권이라도 이용 기준이 다릅니다</h2>
@@ -500,7 +524,7 @@ function lifeHub() {
     h1: '수도권 생활권 안내', eyebrow: '생활권', heroSub: '서울·경기·인천의 업무지구, 신도시, 주거지, 숙소 인접 생활권을 비교해 확인하세요.',
     seed: 'life-hub', badge: '생활권 안내',
     breadcrumbTrail: [crumbHome, { label: '생활권', href: '/life/' }],
-    toc: [{ id: 'intro', label: '생활권 안내' }, { id: 'type', label: '생활권 유형' }, { id: 'operating', label: '운영 기준' }, { id: 'trust', label: '작성·검수 기준' }, { id: 'related', label: '관련 안내' }],
+    toc: [{ id: 'intro', label: '생활권 안내' }, { id: 'type', label: '생활권 유형' }, { id: 'operating', label: '운영 기준' }, { id: 'trust', label: '작성·검수 안내' }, { id: 'related', label: '관련 안내' }],
     inner,
   });
 }
@@ -527,7 +551,7 @@ function stationHub() {
     h1: '수도권 지하철역 안내', eyebrow: '지하철역', heroSub: '서울·경기·인천 주요 역세권의 이용 기준을 역명 기준으로 안내합니다. 출구별 페이지는 만들지 않습니다.',
     seed: 'station-hub', badge: '역세권 안내',
     breadcrumbTrail: [crumbHome, { label: '지하철역', href: '/station/' }],
-    toc: [{ id: 'intro', label: '지하철역 안내' }, { id: 'rule', label: '역세권 이용 기준' }, { id: 'operating', label: '운영 기준' }, { id: 'trust', label: '작성·검수 기준' }, { id: 'related', label: '관련 안내' }],
+    toc: [{ id: 'intro', label: '지하철역 안내' }, { id: 'rule', label: '역세권 이용 기준' }, { id: 'operating', label: '운영 기준' }, { id: 'trust', label: '작성·검수 안내' }, { id: 'related', label: '관련 안내' }],
     inner,
   });
 }
@@ -563,7 +587,7 @@ function provinceListPage(provKey, kind) {
     heroSub: `${prov.name}의 ${isLife ? '대표 생활권' : '주요 역세권'}을 한눈에 비교하고 이용 기준을 확인하세요.`,
     seed: provKey + kind, badge: `${prov.name} ${isLife ? '생활권' : '역'}`,
     breadcrumbTrail: [crumbHome, { label: prov.name, href: prov.href }, { label: isLife ? '생활권' : '지하철역', href: url }],
-    toc: [{ id: 'intro', label: `${isLife ? '생활권' : '지하철역'} 안내` }, { id: 'region', label: `${prov.sib} 바로가기` }, { id: 'operating', label: '운영 기준' }, { id: 'trust', label: '작성·검수 기준' }, { id: 'related', label: '관련 안내' }],
+    toc: [{ id: 'intro', label: `${isLife ? '생활권' : '지하철역'} 안내` }, { id: 'region', label: `${prov.sib} 바로가기` }, { id: 'operating', label: '운영 기준' }, { id: 'trust', label: '작성·검수 안내' }, { id: 'related', label: '관련 안내' }],
     inner,
   });
 }
@@ -589,7 +613,7 @@ function outskirtsPage() {
     h1: '경기 외곽 지역 안내', eyebrow: '경기 · 외곽', heroSub: '경기 외곽 지역의 추가 이동비, 예약 가능 시간, 도로명 주소 확인 기준을 안내합니다.',
     seed: 'gyeonggi-outskirts', badge: '외곽 안내',
     breadcrumbTrail: [crumbHome, { label: '경기', href: '/gyeonggi/' }, { label: '외곽 지역 안내', href: '/gyeonggi/outskirts/' }],
-    toc: [{ id: 'intro', label: '외곽 안내' }, { id: 'point', label: '확인 포인트' }, { id: 'area', label: '외곽 권역' }, { id: 'operating', label: '운영 기준' }, { id: 'trust', label: '작성·검수 기준' }, { id: 'related', label: '관련 안내' }],
+    toc: [{ id: 'intro', label: '외곽 안내' }, { id: 'point', label: '확인 포인트' }, { id: 'area', label: '외곽 권역' }, { id: 'operating', label: '운영 기준' }, { id: 'trust', label: '작성·검수 안내' }, { id: 'related', label: '관련 안내' }],
     inner,
   });
 }
@@ -615,7 +639,7 @@ function airportIslandsPage() {
     h1: '공항·도서 지역 안내', eyebrow: '인천 · 공항·도서', heroSub: '인천공항, 영종, 강화, 옹진 도서 지역의 사전 예약과 이동 기준을 안내합니다.',
     seed: 'incheon-airport', badge: '공항·도서',
     breadcrumbTrail: [crumbHome, { label: '인천', href: '/incheon/' }, { label: '공항·도서 지역 안내', href: '/incheon/airport-islands/' }],
-    toc: [{ id: 'intro', label: '공항·도서 안내' }, { id: 'point', label: '확인 포인트' }, { id: 'area', label: '대상 권역' }, { id: 'operating', label: '운영 기준' }, { id: 'trust', label: '작성·검수 기준' }, { id: 'related', label: '관련 안내' }],
+    toc: [{ id: 'intro', label: '공항·도서 안내' }, { id: 'point', label: '확인 포인트' }, { id: 'area', label: '대상 권역' }, { id: 'operating', label: '운영 기준' }, { id: 'trust', label: '작성·검수 안내' }, { id: 'related', label: '관련 안내' }],
     inner,
   });
 }
@@ -641,7 +665,7 @@ function useHub() {
     h1: '이용 장소별 안내', eyebrow: '이용 장소', heroSub: '자택, 호텔·숙소, 오피스텔, 업무지구, 역세권, 야간, 외곽, 공항·도서 이용 기준을 확인하세요.',
     seed: 'use-hub', badge: '이용 장소',
     breadcrumbTrail: [crumbHome, { label: '이용 장소', href: '/use/' }],
-    toc: [{ id: 'intro', label: '이용 장소 안내' }, { id: 'operating', label: '운영 기준' }, { id: 'trust', label: '작성·검수 기준' }, { id: 'related', label: '관련 안내' }],
+    toc: [{ id: 'intro', label: '이용 장소 안내' }, { id: 'operating', label: '운영 기준' }, { id: 'trust', label: '작성·검수 안내' }, { id: 'related', label: '관련 안내' }],
     inner,
   });
 }
@@ -667,7 +691,7 @@ function checkHub() {
     h1: '예약 전 확인', eyebrow: '예약 전 확인', heroSub: '방문 주소, 건물 출입 방식, 추가 이동비, 예약 시간 등 예약 전 확인할 항목을 정리했습니다.',
     seed: 'check-hub', badge: '예약 전 확인',
     breadcrumbTrail: [crumbHome, { label: '예약 전 확인', href: '/check/' }],
-    toc: [{ id: 'intro', label: '예약 전 확인' }, { id: 'reserve', label: '체크리스트' }, { id: 'operating', label: '운영 기준' }, { id: 'trust', label: '작성·검수 기준' }],
+    toc: [{ id: 'intro', label: '예약 전 확인' }, { id: 'reserve', label: '체크리스트' }, { id: 'operating', label: '운영 기준' }, { id: 'trust', label: '작성·검수 안내' }],
     inner,
   });
 }
@@ -698,7 +722,7 @@ function policyHub() {
     h1: '운영 기준', eyebrow: '운영 기준', heroSub: '안전한 이용을 위한 운영 기준과 개인정보, 불법·선정적 서비스 불가 안내입니다.',
     seed: 'policy-hub', badge: '운영 기준',
     breadcrumbTrail: [crumbHome, { label: '운영 기준', href: '/policy/' }],
-    toc: [{ id: 'intro', label: '운영 기준' }, { id: 'trust', label: '작성·검수 기준' }],
+    toc: [{ id: 'intro', label: '운영 기준' }, { id: 'trust', label: '작성·검수 안내' }],
     inner,
   });
 }
@@ -723,7 +747,7 @@ function privacyPage() {
     h1: '개인정보 처리방침', eyebrow: '개인정보', heroSub: '예약 확인과 연락에 필요한 최소 정보만 수집·이용하며, 목적 달성 후 지체 없이 파기합니다.',
     seed: 'privacy', badge: '개인정보',
     breadcrumbTrail: [crumbHome, { label: '운영 기준', href: '/policy/' }, { label: '개인정보 처리방침', href: '/policy/privacy/' }],
-    toc: [{ id: 'intro', label: '개요' }, { id: 'collect', label: '수집 항목' }, { id: 'use2', label: '이용 목적' }, { id: 'right', label: '이용자 권리' }, { id: 'trust', label: '작성·검수 기준' }],
+    toc: [{ id: 'intro', label: '개요' }, { id: 'collect', label: '수집 항목' }, { id: 'use2', label: '이용 목적' }, { id: 'right', label: '이용자 권리' }, { id: 'trust', label: '작성·검수 안내' }],
     inner,
   });
 }
@@ -746,7 +770,7 @@ function legalPage() {
     h1: '불법·선정적 서비스 불가 안내', eyebrow: '운영 원칙', heroSub: '본 사이트는 합법적이고 정상적인 방문형 관리 안내만 제공합니다.',
     seed: 'legal', badge: '운영 원칙',
     breadcrumbTrail: [crumbHome, { label: '운영 기준', href: '/policy/' }, { label: '불법·선정적 서비스 불가', href: '/policy/legal/' }],
-    toc: [{ id: 'intro', label: '개요' }, { id: 'rule', label: '기본 원칙' }, { id: 'report', label: '신고 안내' }, { id: 'trust', label: '작성·검수 기준' }],
+    toc: [{ id: 'intro', label: '개요' }, { id: 'rule', label: '기본 원칙' }, { id: 'report', label: '신고 안내' }, { id: 'trust', label: '작성·검수 안내' }],
     inner,
   });
 }
@@ -772,7 +796,7 @@ function contactPage() {
     h1: '문의하기', eyebrow: '문의', heroSub: `예약은 전화 ${SITE.phone}, 웹사이트 제작·제휴 문의는 텔레그램으로 빠르게 안내합니다.`,
     seed: 'contact', badge: `예약 ${SITE.phone}`,
     breadcrumbTrail: [crumbHome, { label: '문의하기', href: '/contact/' }],
-    toc: [{ id: 'intro', label: '문의 안내' }, { id: 'area', label: '안내 지역' }, { id: 'operating', label: '운영 기준' }, { id: 'trust', label: '작성·검수 기준' }],
+    toc: [{ id: 'intro', label: '문의 안내' }, { id: 'area', label: '안내 지역' }, { id: 'operating', label: '운영 기준' }, { id: 'trust', label: '작성·검수 안내' }],
     inner,
   });
 }
