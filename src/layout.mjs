@@ -155,6 +155,10 @@ ${noindex ? '<meta name="robots" content="noindex, follow">' : '<meta name="robo
 <meta name="author" content="수도권 방문형 서비스 지역 안내팀">
 <meta name="theme-color" content="#FF8C1A">
 <meta name="format-detection" content="telephone=yes">
+${url === '/' && SITE.verification?.naver ? `<meta name="naver-site-verification" content="${SITE.verification.naver}">` : ''}
+${url === '/' && SITE.verification?.google ? `<meta name="google-site-verification" content="${SITE.verification.google}">` : ''}
+<link rel="alternate" type="application/rss+xml" title="${esc(SITE.name)} 업데이트" href="/rss.xml">
+<link rel="sitemap" type="application/xml" href="/sitemap.xml">
 <!-- Open Graph -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="${esc(SITE.name)}">

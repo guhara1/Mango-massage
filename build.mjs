@@ -47,7 +47,7 @@ async function main() {
     const thumbPath = dir ? `${dir}/thumb.svg` : 'thumb.svg';
     await emit(thumbPath, thumbFile(p.url, p.imageAlt || p.title));
 
-    if (!p.noindex) urls.push(p.url);
+    if (!p.noindex) urls.push({ url: p.url, title: p.title, description: p.description });
   }
 
   // sitemap.xml
@@ -56,20 +56,58 @@ async function main() {
 <urlset xmlns="http://www.sitemap.org/schemas/sitemap/0.9"
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
 ${urls.map((u) => `  <url>
-    <loc>${SITE.baseUrl}${encodeURI(u)}</loc>
+    <loc>${SITE.baseUrl}${encodeURI(u.url)}</loc>
     <lastmod>${today}</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>${u === '/' ? '1.0' : '0.7'}</priority>
-    <image:image><image:loc>${SITE.baseUrl}${encodeURI(u)}thumb.svg</image:loc></image:image>
+    <priority>${u.url === '/' ? '1.0' : '0.7'}</priority>
+    <image:image><image:loc>${SITE.baseUrl}${encodeURI(u.url)}thumb.svg</image:loc></image:image>
   </url>`).join('\n')}
 </urlset>`.replace('sitemap.org/schemas/sitemap', 'sitemaps.org/schemas/sitemap');
   await emit('sitemap.xml', sitemap);
 
-  // robots.txt
+  // robots.txt — 네이버(Yeti)·구글·빙 포함 전체 허용 + 사이트맵
   await emit('robots.txt', `User-agent: *
 Allow: /
+
+User-agent: Yeti
+Allow: /
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: bingbot
+Allow: /
+
 Sitemap: ${SITE.baseUrl}/sitemap.xml
 `);
+
+  // RSS 2.0 피드 (색인 페이지 기준, 네이버 RSS 제출 호환)
+  const esc = (s = '') => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const rssDate = 'Sat, 28 Jun 2026 00:00:00 +0900';
+  const rss = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+<title>${esc(SITE.name)} · ${esc(SITE.tagline)}</title>
+<link>${SITE.baseUrl}/</link>
+<atom:link href="${SITE.baseUrl}/rss.xml" rel="self" type="application/rss+xml"/>
+<description>서울·경기·인천 출장마사지·홈타이 지역별 예약 안내</description>
+<language>ko</language>
+<lastBuildDate>${rssDate}</lastBuildDate>
+${urls.map((u) => `<item>
+  <title>${esc(u.title)}</title>
+  <link>${SITE.baseUrl}${encodeURI(u.url)}</link>
+  <guid isPermaLink="true">${SITE.baseUrl}${encodeURI(u.url)}</guid>
+  <pubDate>${rssDate}</pubDate>
+  <description>${esc(u.description || SITE.tagline)}</description>
+</item>`).join('\n')}
+</channel>
+</rss>`;
+  await emit('rss.xml', rss);
+
+  // IndexNow 키 파일 (도메인 루트에서 키 검증)
+  if (SITE.indexNowKey) {
+    await emit(`${SITE.indexNowKey}.txt`, SITE.indexNowKey + '\n');
+  }
 
   // 404
   await emit('404.html', page({

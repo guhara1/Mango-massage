@@ -14,6 +14,13 @@ export const SITE = {
   phoneLabel: '전화예약',
   // 외부 문의/제휴 채널
   telegram: 'https://t.me/googleseolab',
+  // 검색엔진 사이트 소유확인 (메인 페이지 head)
+  verification: {
+    naver: 'ffe3a1421064f374675bb35aa08f60751e4a1b4b',
+    google: '', // 구글 서치콘솔 메타 확인 코드 사용 시 입력
+  },
+  // IndexNow (빙·네이버·얀덱스 즉시 색인 통보). 키 파일: docs/<key>.txt
+  indexNowKey: '7d3f9a2c6e1b4805af93c7e2d6105b8e',
   // 권위 있는 외부 참고 링크 (E-E-A-T · 외부 인용)
   authority: {
     hira: { label: '건강보험심사평가원', url: 'https://www.hira.or.kr' },
