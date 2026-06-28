@@ -2,7 +2,7 @@
 import { SITE } from './site.mjs';
 import { header, footer, esc, thumbSVG } from './components.mjs';
 
-const abs = (p) => (p.startsWith('http') ? p : SITE.baseUrl + p);
+const abs = (p) => (p.startsWith('http') ? p : SITE.baseUrl + encodeURI(p));
 
 // ── 구조화 데이터 ──
 function schemaBlocks({ url, title, description, breadcrumb = [], faqs = [], imageAlt }) {

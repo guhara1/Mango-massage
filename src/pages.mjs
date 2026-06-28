@@ -1,6 +1,6 @@
 // 모든 페이지 본문 + 메타데이터 빌더
 import { SITE } from './site.mjs';
-import { hero, breadcrumb, esc } from './components.mjs';
+import { hero, breadcrumb, esc, pricingSection } from './components.mjs';
 import {
   article, COMMON_FAQ, RESERVE_CHECKLIST, checklistHtml,
   operatingBlock, trustBlock, relatedBlock,
@@ -16,6 +16,10 @@ const PROVINCE = {
   incheon: { name: '인천', href: '/incheon/', regions: INCHEON, label: '구', sib: '구군' },
 };
 
+// 번호동을 대표 1개로 통합 + 중복 제거 (모듈 공용)
+const normDongList = (list) =>
+  [...new Set((list || []).map((d) => d.replace(/^([가-힣]+?)\d+동$/, '$1동')))];
+
 // ─────────────────────────────────────────────────────────
 // 지역(구/시군) 상세 페이지
 // ─────────────────────────────────────────────────────────
@@ -28,6 +32,7 @@ function regionPage(provKey, r) {
 
   const toc = [
     { id: 'overview', label: `${r.name} 개요` },
+    { id: 'price', label: '기본 요금' },
     { id: 'life', label: '대표 생활권' },
     { id: 'dong', label: '행정동 전체' },
     { id: 'stations', label: '가까운 지하철역' },
@@ -40,21 +45,23 @@ function regionPage(provKey, r) {
   ];
 
   // 번호동 안전 통합: '가양1동'·'동탄2동' 등 → 대표 1개. ('종로1가동' 등 가동 형태는 보존)
-  const collapseDong = (d) => d.replace(/^([가-힣]+?)\d+동$/, '$1동');
-  const normDongs = (list) => [...new Set((list || []).map(collapseDong))];
-  const dongChips = (list) =>
+  const normDongs = (list) => [...new Set((list || []).map((d) => d.replace(/^([가-힣]+?)\d+동$/, '$1동')))];
+  // 행정동 칩을 클릭 가능한 링크로 (개별 행정동 페이지로 연결)
+  const dongChips = (base, list) =>
     `<div class="chips" style="margin-bottom:1em">${normDongs(list)
-      .map((d) => `<span class="chip">${esc(d)}</span>`).join('')}</div>`;
+      .map((d) => `<a class="chip" href="${base}${encodeURI(d)}/">${esc(d)}</a>`).join('')}</div>`;
 
-  // 일반구가 있으면 구별로, 없으면 동 목록으로 — 번호동은 데이터에서 대표 1개로 통합됨
-  const dongBody = r.districts && r.districts.length
-    ? r.districts.map((d) =>
-        `<h3>${esc(d.name)}</h3>${dongChips(d.dongs)}`).join('') +
-        (r.dongs && r.dongs.length ? `<h3>${esc(r.name)} 주요 동</h3>${dongChips(r.dongs)}` : '')
-    : dongChips(r.dongs || []);
+  // 일반구가 있으면 구 페이지로 링크 + 구별 행정동, 없으면 동 목록
+  const hasGu = r.districts && r.districts.length;
+  const dongBody = hasGu
+    ? r.districts.map((d) => {
+        const guBase = `${url}${encodeURI(d.name)}/`;
+        return `<h3><a href="${guBase}">${esc(d.name)} 안내 →</a></h3>${dongChips(guBase, d.dongs)}`;
+      }).join('')
+    : dongChips(url, r.dongs || []);
 
-  const dongCount = r.districts && r.districts.length
-    ? r.districts.reduce((n, d) => n + normDongs(d.dongs).length, 0) + normDongs(r.dongs).length
+  const dongCount = hasGu
+    ? r.districts.reduce((n, d) => n + normDongs(d.dongs).length, 0)
     : normDongs(r.dongs).length;
 
   const inner = `
@@ -70,7 +77,7 @@ function regionPage(provKey, r) {
     <p>각 생활권은 <a href="${prov.href}life/">${prov.name} 생활권 안내</a>에서 더 자세히 비교할 수 있습니다.</p>
 
     <h2 id="dong">${r.name} 행정동 전체 안내</h2>
-    <p>${r.name}의 행정동을 대표 지역명 기준으로 정리했습니다(총 ${dongCount}곳). 같은 이름의 번호동(예: ○○1동·○○2동)은 대표 동 하나로 묶어 안내하며, 출구별·번호동별 페이지는 따로 만들지 않습니다. 방문 예약 시에는 아래 동 이름과 함께 정확한 도로명 주소·동·호수를 알려주시면 안내가 빠릅니다.</p>
+    <p>${r.name}의 행정동을 대표 지역명 기준으로 정리했습니다(총 ${dongCount}곳). ${hasGu ? '<strong>일반구 이름</strong>을 누르면 해당 구 안내로, <strong>동 이름</strong>을 누르면 행정동별 안내로 이동합니다. ' : '<strong>동 이름</strong>을 누르면 해당 행정동 안내로 이동합니다. '}같은 이름의 번호동(예: ○○1동·○○2동)은 대표 동 하나로 묶어 안내하며, 출구별·번호동별 페이지는 따로 만들지 않습니다. 방문 예약 시에는 아래 동 이름과 함께 정확한 도로명 주소·동·호수를 알려주시면 안내가 빠릅니다.</p>
     ${dongBody}
     <p>각 동은 인접 생활권·역세권과 함께 확인하는 것이 좋습니다. ${r.name}의 생활권은 <a href="${prov.href}life/">${prov.name} 생활권 안내</a>, 가까운 역은 <a href="${prov.href}station/">${prov.name} 지하철역 안내</a>, 이용 장소별 기준은 <a href="/use/">이용 장소 안내</a>에서 확인하세요.</p>
 
@@ -130,6 +137,7 @@ function regionPage(provKey, r) {
         seed: r.slug + provKey,
         badge: `${r.name} 안내`,
       }) +
+      pricingSection({ regionName: r.name }) +
       article({ toc, inner }),
   };
 }
@@ -139,6 +147,168 @@ function faqHtml(faqs) {
   return `<div class="faq">${faqs
     .map((f) => `<details><summary>${esc(f.q)}</summary><p>${f.a}</p></details>`)
     .join('')}</div>`;
+}
+
+const dongChipsLinked = (base, list) =>
+  `<div class="chips" style="margin-bottom:1em">${normDongList(list)
+    .map((d) => `<a class="chip" href="${base}${encodeURI(d)}/">${esc(d)}</a>`).join('')}</div>`;
+
+// ─────────────────────────────────────────────────────────
+// 일반구 페이지 (경기 행정구: 수원 장안구 등)
+// ─────────────────────────────────────────────────────────
+function generalGuPage(provKey, city, district) {
+  const prov = PROVINCE[provKey];
+  const cityUrl = `${prov.href}${city.slug}/`;
+  const url = `${cityUrl}${district.name}/`;
+  const dongs = normDongList(district.dongs);
+  const siblingGu = city.districts.filter((d) => d.name !== district.name);
+  const toc = [
+    { id: 'overview', label: `${district.name} 개요` },
+    { id: 'price', label: '기본 요금' },
+    { id: 'dong', label: '행정동 안내' },
+    { id: 'use', label: '이용 장소별 기준' },
+    { id: 'reserve', label: '예약 전 체크리스트' },
+    { id: 'operating', label: '운영 기준' },
+    { id: 'faq', label: '자주 묻는 질문' },
+    { id: 'trust', label: '작성·검수 안내' },
+    { id: 'related', label: '관련 지역' },
+  ];
+  const inner = `
+    <h2 id="overview">${city.name} ${district.name} 지역 개요</h2>
+    <p>${district.name}은 ${city.name}에 속한 행정구입니다. ${esc(city.character)} ${district.name} 일대도 같은 ${city.name} 생활권 안에서 행정동과 이용 장소에 따라 방문 전 확인할 내용이 달라집니다.</p>
+    <p>${city.name} ${district.name} 출장마사지·홈타이 예약 전에는 방문할 행정동, 가까운 역, 건물 형태(자택·오피스텔·숙소)를 먼저 확인하면 안내가 빠릅니다. ${city.name} 전체 안내는 <a href="${cityUrl}">${city.name} 안내</a>에서 볼 수 있습니다.</p>
+
+    <h2 id="dong">${district.name} 행정동 안내</h2>
+    <p>${district.name}의 행정동을 대표 지역명 기준으로 정리했습니다(총 ${dongs.length}곳). 동 이름을 누르면 해당 행정동 안내로 이동합니다. 번호동은 대표 동 하나로 묶어 안내합니다.</p>
+    ${dongChipsLinked(url, district.dongs)}
+    <p>가까운 생활권은 <a href="${prov.href}life/">${prov.name} 생활권 안내</a>, 가까운 역은 <a href="${prov.href}station/">${prov.name} 지하철역 안내</a>에서 확인하세요.</p>
+
+    <h2 id="use">이용 장소별 확인 기준</h2>
+    <p>${esc(city.useFlavor)}</p>
+    <ul>
+      <li><strong>자택</strong> — 도로명 주소·동·호수와 공동현관 출입 방식 확인. <a href="/use/home/">자택 이용 안내</a></li>
+      <li><strong>호텔·숙소</strong> — 숙소의 외부인 객실 방문 정책 확인. <a href="/use/hotel/">호텔·숙소 이용 안내</a></li>
+      <li><strong>오피스텔</strong> — 공동현관·관리 규정·방문 시간대 확인. <a href="/use/officetel/">오피스텔 이용 안내</a></li>
+      ${city.outskirts ? `<li><strong>외곽 이동</strong> — ${esc(city.outskirts)} <a href="/use/outskirts/">외곽 지역 이용 안내</a></li>` : ''}
+    </ul>
+
+    <h2 id="reserve">예약 전 체크리스트</h2>
+    ${checklistHtml(RESERVE_CHECKLIST)}
+    <p style="margin-top:1em">전화 예약·문의 <a href="tel:${SITE.phone.replace(/-/g, '')}">${SITE.phone}</a></p>
+
+    ${operatingBlock()}
+
+    <h2 id="faq">${district.name} 자주 묻는 질문</h2>
+    ${faqHtml(COMMON_FAQ)}
+
+    ${trustBlock({ experience: `${city.name} ${district.name}의 생활권 차이와 자택·숙소·오피스텔 이용 시 확인 기준을 반영합니다.` })}
+
+    ${relatedBlock(`${city.name} 관련 지역`, [
+      { label: `${city.name} 전체`, href: cityUrl },
+      ...siblingGu.map((d) => ({ label: d.name, href: `${cityUrl}${d.name}/` })),
+      { label: `${prov.name} 생활권`, href: `${prov.href}life/` },
+      { label: '예약 전 확인', href: '/check/' },
+    ])}
+  `;
+  return {
+    url, current: prov.href, noindex: false,
+    title: `${city.name} ${district.name} 출장마사지 · 예약 안내｜${SITE.name}`,
+    description: `${city.name} ${district.name} 출장마사지·홈타이 예약 전 행정동과 이용 기준을 안내합니다.`,
+    imageAlt: `${city.name} ${district.name} 방문형 관리 안내 이미지`,
+    breadcrumb: [crumbHome, { label: prov.name, href: prov.href }, { label: city.name, href: cityUrl }, { label: district.name, href: url }],
+    faqs: COMMON_FAQ,
+    body:
+      breadcrumb([crumbHome, { label: prov.name, href: prov.href }, { label: city.name, href: cityUrl }, { label: district.name, href: url }]) +
+      hero({
+        eyebrow: `${prov.name} ${city.name} · 행정구`,
+        h1: `${district.name} 출장마사지 · 예약 안내`,
+        sub: `${city.name} ${district.name}의 행정동, 가까운 역, 자택·오피스텔·숙소 이용 기준을 확인하세요.`,
+        ctas: [{ label: '전화 예약', href: `tel:${SITE.phone.replace(/-/g, '')}` }, { label: '예약 전 확인', href: '/check/', variant: 'btn-ghost' }],
+        seed: city.slug + district.name, badge: `${district.name} 안내`,
+      }) +
+      pricingSection({ regionName: `${city.name} ${district.name}` }) +
+      article({ toc, inner }),
+  };
+}
+
+// ─────────────────────────────────────────────────────────
+// 행정동 페이지 (개별 동 — 클릭 가능, noindex)
+// ─────────────────────────────────────────────────────────
+function dongPage(provKey, region, dongName, parentLabel, base, siblingDongs) {
+  const prov = PROVINCE[provKey];
+  const url = `${base}${dongName}/`;
+  const parentUrl = base; // 상위(구/시 또는 일반구) URL
+  const where = parentLabel ? `${region.name} ${parentLabel}` : region.name;
+  const sibs = normDongList(siblingDongs).filter((d) => d !== dongName).slice(0, 14);
+  const toc = [
+    { id: 'overview', label: `${dongName} 개요` },
+    { id: 'price', label: '기본 요금' },
+    { id: 'area', label: '생활권·가까운 역' },
+    { id: 'use', label: '이용 장소별 기준' },
+    { id: 'reserve', label: '예약 전 체크리스트' },
+    { id: 'operating', label: '운영 기준' },
+    { id: 'faq', label: '자주 묻는 질문' },
+    { id: 'trust', label: '작성·검수 안내' },
+    { id: 'related', label: '관련 지역' },
+  ];
+  const inner = `
+    <h2 id="overview">${dongName} 출장마사지 지역 개요</h2>
+    <p>${dongName}은 ${where}에 속한 행정동입니다. ${esc(region.character)} ${dongName}에서 방문 예약을 진행할 때도 정확한 도로명 주소와 동·호수, 공동현관 출입 방식을 먼저 확인하면 안내가 빠릅니다.</p>
+    <p>${dongName} 출장마사지·홈타이는 자택, 오피스텔, 호텔·숙소 등 이용 장소에 따라 확인할 내용이 다릅니다. ${region.name} 전체 안내는 <a href="${prov.href}${region.slug}/">${region.name} 안내</a>${parentLabel ? `, ${parentLabel} 안내는 <a href="${parentUrl}">${parentLabel} 안내</a>` : ''}에서 볼 수 있습니다.</p>
+
+    <h2 id="area">${dongName} 생활권·가까운 역</h2>
+    <p>${dongName}과 인접한 ${region.name}의 대표 생활권과 주요 역은 다음과 같습니다. 가까운 생활권을 기준으로 방문 동선을 확인하세요.</p>
+    <div class="chips" style="margin-bottom:1em">
+      ${region.lifeAreas.map((l) => `<span class="chip">${esc(l)}</span>`).join('')}
+      ${region.stations.map((s) => `<span class="chip">🚉 ${esc(s)}</span>`).join('')}
+    </div>
+    <p>생활권 비교는 <a href="${prov.href}life/">${prov.name} 생활권 안내</a>, 역세권 기준은 <a href="/use/station-area/">역세권 이용 안내</a>를 참고하세요.</p>
+
+    <h2 id="use">${dongName} 이용 장소별 기준</h2>
+    <p>${esc(region.useFlavor)}</p>
+    <ul>
+      <li><strong>자택</strong> — <a href="/use/home/">자택 이용 안내</a></li>
+      <li><strong>호텔·숙소</strong> — <a href="/use/hotel/">호텔·숙소 이용 안내</a></li>
+      <li><strong>오피스텔</strong> — <a href="/use/officetel/">오피스텔 이용 안내</a></li>
+      <li><strong>업무지구·역세권</strong> — <a href="/use/business/">업무지구 이용</a> · <a href="/use/station-area/">역세권 이용</a></li>
+    </ul>
+
+    <h2 id="reserve">예약 전 체크리스트</h2>
+    ${checklistHtml(RESERVE_CHECKLIST)}
+    <p style="margin-top:1em">전화 예약·문의 <a href="tel:${SITE.phone.replace(/-/g, '')}">${SITE.phone}</a></p>
+
+    ${operatingBlock()}
+
+    <h2 id="faq">${dongName} 자주 묻는 질문</h2>
+    ${faqHtml(COMMON_FAQ)}
+
+    ${trustBlock({ experience: `${where} ${dongName}의 이용 환경과 자택·숙소·오피스텔 방문 시 확인 기준을 반영합니다.` })}
+
+    <h2 id="related">${where} 인근 행정동</h2>
+    <div class="related"><div class="chips">
+      <a class="chip" href="${parentUrl}">${esc(parentLabel || region.name)} 전체</a>
+      ${sibs.map((d) => `<a class="chip" href="${base}${encodeURI(d)}/">${esc(d)}</a>`).join('')}
+    </div></div>
+  `;
+  return {
+    url, current: prov.href, noindex: true, // 개별 행정동은 색인 부담 방지를 위해 noindex(팔로우)
+    title: `${dongName} 출장마사지 · ${region.name} 예약 안내｜${SITE.name}`,
+    description: `${dongName}(${where}) 출장마사지·홈타이 예약 전 확인사항과 이용 기준 안내.`,
+    imageAlt: `${dongName} 방문형 관리 안내 이미지`,
+    breadcrumb: [crumbHome, { label: prov.name, href: prov.href }, { label: region.name, href: `${prov.href}${region.slug}/` }, { label: dongName, href: url }],
+    faqs: COMMON_FAQ,
+    body:
+      breadcrumb([crumbHome, { label: prov.name, href: prov.href }, { label: region.name, href: `${prov.href}${region.slug}/` }, { label: dongName, href: url }]) +
+      hero({
+        eyebrow: `${where} · 행정동`,
+        h1: `${dongName} 출장마사지 · 예약 안내`,
+        sub: `${dongName}에서 방문형 관리를 찾을 때 확인할 생활권, 가까운 역, 이용 장소 기준을 안내합니다.`,
+        ctas: [{ label: '전화 예약', href: `tel:${SITE.phone.replace(/-/g, '')}` }, { label: '예약 전 확인', href: '/check/', variant: 'btn-ghost' }],
+        seed: region.slug + dongName, badge: `${dongName}`,
+      }) +
+      pricingSection({ regionName: dongName }) +
+      article({ toc, inner }),
+  };
 }
 
 // ─────────────────────────────────────────────────────────
@@ -232,6 +402,7 @@ function provinceHub(provKey, opts) {
         seed: provKey + 'hub',
         badge: `${prov.name} 지역 안내`,
       }) +
+      pricingSection({ regionName: prov.name }) +
       article({ toc, inner }),
   };
 }
@@ -242,9 +413,24 @@ function provinceHub(provKey, opts) {
 export function buildManifest() {
   const pages = [];
 
-  // 지역 상세
+  // 지역 상세: 시/구(행정시·자치구) → 일반구(행정구) → 행정동
   ['seoul', 'gyeonggi', 'incheon'].forEach((pk) => {
-    PROVINCE[pk].regions.forEach((r) => pages.push(regionPage(pk, r)));
+    const base = PROVINCE[pk].href;
+    PROVINCE[pk].regions.forEach((r) => {
+      pages.push(regionPage(pk, r));
+      if (r.districts && r.districts.length) {
+        r.districts.forEach((d) => {
+          pages.push(generalGuPage(pk, r, d));
+          const guBase = `${base}${r.slug}/${d.name}/`;
+          normDongList(d.dongs).forEach((dn) =>
+            pages.push(dongPage(pk, r, dn, d.name, guBase, d.dongs)));
+        });
+      } else {
+        const regBase = `${base}${r.slug}/`;
+        normDongList(r.dongs).forEach((dn) =>
+          pages.push(dongPage(pk, r, dn, null, regBase, r.dongs)));
+      }
+    });
   });
 
   // 허브
@@ -406,6 +592,7 @@ function checkPage(c) {
 function mainPage() {
   const toc = [
     { id: 'diff', label: '수도권은 지역별 기준이 다릅니다' },
+    { id: 'price', label: '기본 요금' },
     { id: 'regions', label: '지역별 바로가기' },
     { id: 'life', label: '생활권별 안내' },
     { id: 'use', label: '이용 장소별 안내' },
@@ -477,6 +664,7 @@ function mainPage() {
         seed: 'mango-main',
         badge: `예약 ${SITE.phone}`,
       }) +
+      pricingSection({}) +
       article({ toc, inner }),
   };
 }

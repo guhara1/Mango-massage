@@ -184,11 +184,60 @@
     <image:image><image:loc>https://mango-massage.example/gyeonggi/suwon/thumb.svg</image:loc></image:image>
   </url>
   <url>
+    <loc>https://mango-massage.example/gyeonggi/suwon/%EC%9E%A5%EC%95%88%EA%B5%AC/</loc>
+    <lastmod>2026-06-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <image:image><image:loc>https://mango-massage.example/gyeonggi/suwon/%EC%9E%A5%EC%95%88%EA%B5%AC/thumb.svg</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://mango-massage.example/gyeonggi/suwon/%EA%B6%8C%EC%84%A0%EA%B5%AC/</loc>
+    <lastmod>2026-06-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <image:image><image:loc>https://mango-massage.example/gyeonggi/suwon/%EA%B6%8C%EC%84%A0%EA%B5%AC/thumb.svg</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://mango-massage.example/gyeonggi/suwon/%ED%8C%94%EB%8B%AC%EA%B5%AC/</loc>
+    <lastmod>2026-06-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <image:image><image:loc>https://mango-massage.example/gyeonggi/suwon/%ED%8C%94%EB%8B%AC%EA%B5%AC/thumb.svg</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://mango-massage.example/gyeonggi/suwon/%EC%98%81%ED%86%B5%EA%B5%AC/</loc>
+    <lastmod>2026-06-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <image:image><image:loc>https://mango-massage.example/gyeonggi/suwon/%EC%98%81%ED%86%B5%EA%B5%AC/thumb.svg</image:loc></image:image>
+  </url>
+  <url>
     <loc>https://mango-massage.example/gyeonggi/seongnam/</loc>
     <lastmod>2026-06-28</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
     <image:image><image:loc>https://mango-massage.example/gyeonggi/seongnam/thumb.svg</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://mango-massage.example/gyeonggi/seongnam/%EC%88%98%EC%A0%95%EA%B5%AC/</loc>
+    <lastmod>2026-06-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <image:image><image:loc>https://mango-massage.example/gyeonggi/seongnam/%EC%88%98%EC%A0%95%EA%B5%AC/thumb.svg</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://mango-massage.example/gyeonggi/seongnam/%EC%A4%91%EC%9B%90%EA%B5%AC/</loc>
+    <lastmod>2026-06-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <image:image><image:loc>https://mango-massage.example/gyeonggi/seongnam/%EC%A4%91%EC%9B%90%EA%B5%AC/thumb.svg</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://mango-massage.example/gyeonggi/seongnam/%EB%B6%84%EB%8B%B9%EA%B5%AC/</loc>
+    <lastmod>2026-06-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <image:image><image:loc>https://mango-massage.example/gyeonggi/seongnam/%EB%B6%84%EB%8B%B9%EA%B5%AC/thumb.svg</image:loc></image:image>
   </url>
   <url>
     <loc>https://mango-massage.example/gyeonggi/yongin/</loc>
@@ -198,11 +247,53 @@
     <image:image><image:loc>https://mango-massage.example/gyeonggi/yongin/thumb.svg</image:loc></image:image>
   </url>
   <url>
+    <loc>https://mango-massage.example/gyeonggi/yongin/%EC%B2%98%EC%9D%B8%EA%B5%AC/</loc>
+    <lastmod>2026-06-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <image:image><image:loc>https://mango-massage.example/gyeonggi/yongin/%EC%B2%98%EC%9D%B8%EA%B5%AC/thumb.svg</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://mango-massage.example/gyeonggi/yongin/%EA%B8%B0%ED%9D%A5%EA%B5%AC/</loc>
+    <lastmod>2026-06-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <image:image><image:loc>https://mango-massage.example/gyeonggi/yongin/%EA%B8%B0%ED%9D%A5%EA%B5%AC/thumb.svg</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://mango-massage.example/gyeonggi/yongin/%EC%88%98%EC%A7%80%EA%B5%AC/</loc>
+    <lastmod>2026-06-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <image:image><image:loc>https://mango-massage.example/gyeonggi/yongin/%EC%88%98%EC%A7%80%EA%B5%AC/thumb.svg</image:loc></image:image>
+  </url>
+  <url>
     <loc>https://mango-massage.example/gyeonggi/goyang/</loc>
     <lastmod>2026-06-28</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
     <image:image><image:loc>https://mango-massage.example/gyeonggi/goyang/thumb.svg</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://mango-massage.example/gyeonggi/goyang/%EB%8D%95%EC%96%91%EA%B5%AC/</loc>
+    <lastmod>2026-06-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <image:image><image:loc>https://mango-massage.example/gyeonggi/goyang/%EB%8D%95%EC%96%91%EA%B5%AC/thumb.svg</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://mango-massage.example/gyeonggi/goyang/%EC%9D%BC%EC%82%B0%EB%8F%99%EA%B5%AC/</loc>
+    <lastmod>2026-06-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <image:image><image:loc>https://mango-massage.example/gyeonggi/goyang/%EC%9D%BC%EC%82%B0%EB%8F%99%EA%B5%AC/thumb.svg</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://mango-massage.example/gyeonggi/goyang/%EC%9D%BC%EC%82%B0%EC%84%9C%EA%B5%AC/</loc>
+    <lastmod>2026-06-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <image:image><image:loc>https://mango-massage.example/gyeonggi/goyang/%EC%9D%BC%EC%82%B0%EC%84%9C%EA%B5%AC/thumb.svg</image:loc></image:image>
   </url>
   <url>
     <loc>https://mango-massage.example/gyeonggi/hwaseong/</loc>
@@ -219,11 +310,46 @@
     <image:image><image:loc>https://mango-massage.example/gyeonggi/bucheon/thumb.svg</image:loc></image:image>
   </url>
   <url>
+    <loc>https://mango-massage.example/gyeonggi/bucheon/%EC%9B%90%EB%AF%B8%EA%B5%AC/</loc>
+    <lastmod>2026-06-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <image:image><image:loc>https://mango-massage.example/gyeonggi/bucheon/%EC%9B%90%EB%AF%B8%EA%B5%AC/thumb.svg</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://mango-massage.example/gyeonggi/bucheon/%EC%86%8C%EC%82%AC%EA%B5%AC/</loc>
+    <lastmod>2026-06-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <image:image><image:loc>https://mango-massage.example/gyeonggi/bucheon/%EC%86%8C%EC%82%AC%EA%B5%AC/thumb.svg</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://mango-massage.example/gyeonggi/bucheon/%EC%98%A4%EC%A0%95%EA%B5%AC/</loc>
+    <lastmod>2026-06-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <image:image><image:loc>https://mango-massage.example/gyeonggi/bucheon/%EC%98%A4%EC%A0%95%EA%B5%AC/thumb.svg</image:loc></image:image>
+  </url>
+  <url>
     <loc>https://mango-massage.example/gyeonggi/ansan/</loc>
     <lastmod>2026-06-28</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
     <image:image><image:loc>https://mango-massage.example/gyeonggi/ansan/thumb.svg</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://mango-massage.example/gyeonggi/ansan/%EC%83%81%EB%A1%9D%EA%B5%AC/</loc>
+    <lastmod>2026-06-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <image:image><image:loc>https://mango-massage.example/gyeonggi/ansan/%EC%83%81%EB%A1%9D%EA%B5%AC/thumb.svg</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://mango-massage.example/gyeonggi/ansan/%EB%8B%A8%EC%9B%90%EA%B5%AC/</loc>
+    <lastmod>2026-06-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <image:image><image:loc>https://mango-massage.example/gyeonggi/ansan/%EB%8B%A8%EC%9B%90%EA%B5%AC/thumb.svg</image:loc></image:image>
   </url>
   <url>
     <loc>https://mango-massage.example/gyeonggi/pyeongtaek/</loc>
@@ -238,6 +364,20 @@
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
     <image:image><image:loc>https://mango-massage.example/gyeonggi/anyang/thumb.svg</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://mango-massage.example/gyeonggi/anyang/%EB%A7%8C%EC%95%88%EA%B5%AC/</loc>
+    <lastmod>2026-06-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <image:image><image:loc>https://mango-massage.example/gyeonggi/anyang/%EB%A7%8C%EC%95%88%EA%B5%AC/thumb.svg</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://mango-massage.example/gyeonggi/anyang/%EB%8F%99%EC%95%88%EA%B5%AC/</loc>
+    <lastmod>2026-06-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <image:image><image:loc>https://mango-massage.example/gyeonggi/anyang/%EB%8F%99%EC%95%88%EA%B5%AC/thumb.svg</image:loc></image:image>
   </url>
   <url>
     <loc>https://mango-massage.example/gyeonggi/siheung/</loc>

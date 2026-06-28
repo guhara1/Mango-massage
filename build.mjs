@@ -56,11 +56,11 @@ async function main() {
 <urlset xmlns="http://www.sitemap.org/schemas/sitemap/0.9"
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
 ${urls.map((u) => `  <url>
-    <loc>${SITE.baseUrl}${u}</loc>
+    <loc>${SITE.baseUrl}${encodeURI(u)}</loc>
     <lastmod>${today}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>${u === '/' ? '1.0' : '0.7'}</priority>
-    <image:image><image:loc>${SITE.baseUrl}${u}thumb.svg</image:loc></image:image>
+    <image:image><image:loc>${SITE.baseUrl}${encodeURI(u)}thumb.svg</image:loc></image:image>
   </url>`).join('\n')}
 </urlset>`.replace('sitemap.org/schemas/sitemap', 'sitemaps.org/schemas/sitemap');
   await emit('sitemap.xml', sitemap);

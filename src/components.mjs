@@ -98,6 +98,38 @@ export function breadcrumb(trail = []) {
   </ol></div></nav>`;
 }
 
+// ── 기본 요금표 (메인·허브·지역·행정동 공통) ──
+export const PRICE_TIERS = [
+  { name: '60분 코스', amount: '90,000', min: '60분', desc: '핵심 부위 위주 가벼운 이완' },
+  { name: '90분 코스', amount: '150,000', min: '90분', desc: '전신 균형 표준 구성 · 아로마 포함', featured: true },
+  { name: '120분 코스', amount: '180,000', min: '120분', desc: '구석구석 집중하는 프리미엄 구성' },
+];
+
+export function pricingSection({ regionName = '' } = {}) {
+  const tel = SITE.phone.replace(/-/g, '');
+  const where = regionName ? `${esc(regionName)} 방문 지역과 시간대` : '방문 지역과 시간대';
+  return `<section class="pricing" id="price" aria-label="기본 요금">
+  <div class="container">
+    <div class="pricing-head">
+      <span class="pricing-kicker">기본 요금 안내</span>
+      <h2>코스 시간으로 보는 기본 요금</h2>
+      <p>관리 시간(60·90·120분)을 기준으로 정리한 기본 금액입니다. 표시되지 않은 별도 비용은 두지 않는 것을 원칙으로 안내합니다.</p>
+    </div>
+    <div class="pricing-grid">
+      ${PRICE_TIERS.map((t) => `<div class="price-card${t.featured ? ' featured' : ''}">
+        ${t.featured ? '<span class="price-badge">추천</span>' : ''}
+        <h3>${esc(t.name)}</h3>
+        <div class="price-amt">${esc(t.amount)}<span>원</span></div>
+        <div class="price-dur">${esc(t.min)}</div>
+        <p class="price-desc">${esc(t.desc)}</p>
+        <a class="price-btn${t.featured ? ' featured' : ''}" href="tel:${tel}">예약 문의</a>
+      </div>`).join('')}
+    </div>
+    <p class="pricing-note">${where}, 이동 거리에 따라 최종 금액은 통화 시 확정됩니다. <a href="/check/fare/">요금·예약 기준 자세히 보기 →</a></p>
+  </div>
+</section>`;
+}
+
 // ── 히어로 (좌 텍스트 + 우 썸네일) ──
 export function hero({ eyebrow, h1, sub, ctas = [], seed, badge }) {
   return `<section class="hero">
